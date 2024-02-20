@@ -28,6 +28,20 @@ func (l *MumbleListener) updateUsers() {
 	promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
 	l.Bridge.MumbleUsersMutex.Unlock()
 
+	l.updateVoiceTargets()
+}
+
+func (l *MumbleListener) updateVoiceTargets() {
+    voiceTarget := l.Bridge.MumbleClient.VoiceTarget(0) // Using the first voice target slot
+    voiceTarget.Clear() // Clear existing targets
+
+    // Add all users in the bot's current channel as targets
+    for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
+        voiceTarget.AddUser(user)
+    }
+
+    // Apply the updated voice target
+    l.Bridge.MumbleClient.Send(voiceTarget)
 }
 
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
