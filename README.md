@@ -2,14 +2,9 @@
 
 Mumble Discord Bridge is an open source Go application to bridge the audio between Mumble and Discord.
 
-It was built with the hope that people can continue to use the voice application of their choice.
+This project has been developed for use by [KCDOJRP](https://github.com/MTDOJRP)
 
-## PatchCord.io
-
-Mumble Discord Bridge can be hosted on any server or computer and ships in a Docker container for convenience.
-
-If hosting this application yourself seem like an difficult task please consider [PatchCord.io](https://patchcord.io).
-The site even offers a free tier for those who want to try out Mumble Discord Bridge.
+Original credit to PatchCord.io!
 
 ## Usage
 
@@ -161,14 +156,7 @@ This ensures all packets are opus encoded and should not cause any compatibility
 
 ## Building From Source
 
-This project requires Golang to build from source.
-A simple go build command is all that is needed.
-Ensure the opus library is installed.
-
-```bash
-go install github.com/goreleaser/goreleaser@latest
-goreleaser build --skip-validate --rm-dist --single-target --auto-snapshot
-```
+This project is build using Github Actions, SImply fork the repository, Created a release tag and makes your edits! 
 
 ### OpenBSD Users
 
@@ -185,13 +173,6 @@ A default jitter of 50ms should be adequate for most scenarios.
 A warning will be logged if short burst or audio are seen.
 A single warning can be ignored multiple warnings in short time spans would suggest the need for a larger jitter buffer.
 
-## Monitoring the Bridge (Optional)
-
-The bridge can be started with a Prometheus metrics endpoint enabled.
-The example folder contains the a docker-compose file that will spawn the bridge, Prometheus and Grafana configured to serve a single a pre-configured dashboard.
-
-![Mumble Discord Bridge Grafana Dashboard](example/grafana-dashboard.png "Grafana Dashboard")
-
 ## Known Issues
 
 Currently there is an issue opening the discord voice channel.
@@ -203,19 +184,3 @@ Delays in connecting to Mumble (such as from external authentication plugins) ma
 
 There is an issue seen with Mumble-Server (murmur) 1.3.0 in which the bridge will loose the ability to send messages client after prolonged periods of connectivity.
 This issue has been appears to be resolved by murmur 1.3.4.
-
-## License
-
-Distributed under the MIT License. See LICENSE for more information.
-
-## Contributing
-
-Issues and PRs are welcome and encouraged.
-Please consider opening an issue to discuss features and ideas.
-
-## Acknowledgement
-
-The project would not have been possible without:
-
-* [gumble](https://github.com/layeh/gumble)
-* [discordgo](https://github.com/bwmarrin/discordgo)
