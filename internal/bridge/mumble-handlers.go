@@ -32,15 +32,20 @@ func (l *MumbleListener) updateUsers() {
 }
 
 func (l *MumbleListener) updateVoiceTargets() {
-    // Assuming l.Bridge.MumbleClient.VoiceTarget is the correct way to access your voice target
+    if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.VoiceTarget == nil {
+        log.Println("MumbleClient or VoiceTarget is nil")
+        return
+    }
+    
     // Clear the current voice target's users
     l.Bridge.MumbleClient.VoiceTarget.Clear()
 
     // Iterate over all users in the bot's current channel and add them to the voice target
     for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
         l.Bridge.MumbleClient.VoiceTarget.AddUser(user)
-	}
+    }
 }
+
 
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	//join specified channel
