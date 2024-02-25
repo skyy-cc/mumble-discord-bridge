@@ -15,21 +15,48 @@ type MumbleListener struct {
 }
 
 func (l *MumbleListener) updateUsers() {
-	l.Bridge.MumbleUsersMutex.Lock()
-	l.Bridge.MumbleUsers = make(map[string]bool)
-	for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
-		//note, this might be too slow for really really big channels?
-		//event listeners block while processing
-		//also probably bad to rebuild the set every user change.
-		if user.Name != l.Bridge.MumbleClient.Self.Name {
-			l.Bridge.MumbleUsers[user.Name] = true
-		}
-	}
-	promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
-	l.Bridge.MumbleUsersMutex.Unlock()
+    // Check if l.Bridge is nil to prevent nil pointer dereference
+    if l.Bridge == nil {
+        log.Println("Bridge is nil")
+        return
+    }
 
-	l.updateVoiceTargets()
+    // Lock MumbleUsersMutex to ensure thread safety
+    if l.Bridge.MumbleUsersMutex != nil {
+        l.Bridge.MumbleUsersMutex.Lock()
+        defer l.Bridge.MumbleUsersMutex.Unlock()
+    } else {
+        log.Println("MumbleUsersMutex is nil")
+        return
+    }
+
+    // Initialize MumbleUsers map to prevent nil map assignment
+    l.Bridge.MumbleUsers = make(map[string]bool)
+
+    // Ensure MumbleClient and its properties are not nil
+    if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.Self == nil || l.Bridge.MumbleClient.Self.Channel == nil {
+        log.Println("MumbleClient, Self, or Self.Channel is nil")
+        return
+    }
+
+    for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
+        if user.Name != l.Bridge.MumbleClient.Self.Name {
+            l.Bridge.MumbleUsers[user.Name] = true
+        }
+    }
+
+    // Assuming promMumbleUsers.Set is a function to update some metrics
+    // Check if promMumbleUsers is initialized to prevent nil pointer dereference
+    if promMumbleUsers != nil {
+        promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
+    } else {
+        log.Println("promMumbleUsers is nil")
+    }
+
+    // Update voice targets after updating users
+    l.updateVoiceTargets()
 }
+
 
 func (l *MumbleListener) updateVoiceTargets() {
     if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.VoiceTarget == nil {
