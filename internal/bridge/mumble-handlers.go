@@ -15,25 +15,20 @@ type MumbleListener struct {
 }
 
 func (l *MumbleListener) updateUsers() {
-    // Check if l.Bridge is nil to prevent nil pointer dereference
+    // Ensure l.Bridge is not nil
     if l.Bridge == nil {
         log.Println("Bridge is nil")
         return
     }
 
-    // Lock MumbleUsersMutex to ensure thread safety
-    if l.Bridge.MumbleUsersMutex != nil {
-        l.Bridge.MumbleUsersMutex.Lock()
-        defer l.Bridge.MumbleUsersMutex.Unlock()
-    } else {
-        log.Println("MumbleUsersMutex is nil")
-        return
-    }
+    // Directly lock MumbleUsersMutex without nil check
+    l.Bridge.MumbleUsersMutex.Lock()
+    defer l.Bridge.MumbleUsersMutex.Unlock()
 
-    // Initialize MumbleUsers map to prevent nil map assignment
+    // Initialize MumbleUsers map
     l.Bridge.MumbleUsers = make(map[string]bool)
 
-    // Ensure MumbleClient and its properties are not nil
+    // Ensure MumbleClient and its nested fields are not nil
     if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.Self == nil || l.Bridge.MumbleClient.Self.Channel == nil {
         log.Println("MumbleClient, Self, or Self.Channel is nil")
         return
@@ -45,17 +40,17 @@ func (l *MumbleListener) updateUsers() {
         }
     }
 
-    // Assuming promMumbleUsers.Set is a function to update some metrics
-    // Check if promMumbleUsers is initialized to prevent nil pointer dereference
-    if promMumbleUsers != nil {
+    // Update metrics, assuming promMumbleUsers is correctly initialized elsewhere
+    if promMumbleUsers != nil { // Make sure this is a valid check based on its type
         promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
     } else {
         log.Println("promMumbleUsers is nil")
     }
 
-    // Update voice targets after updating users
+    // Update voice targets
     l.updateVoiceTargets()
 }
+
 
 
 func (l *MumbleListener) updateVoiceTargets() {
