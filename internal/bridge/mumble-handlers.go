@@ -70,6 +70,7 @@ func (l *MumbleListener) updateVoiceTargets() {
 
 
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
+	l.Bridge.MumbleClient = e.Client
 	//join specified channel
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
 	if startingChannel != nil {
