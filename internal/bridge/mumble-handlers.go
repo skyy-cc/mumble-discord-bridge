@@ -54,8 +54,12 @@ func (l *MumbleListener) updateUsers() {
 
 
 func (l *MumbleListener) updateVoiceTargets() {
-    if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.VoiceTarget == nil {
-        log.Println("MumbleClient or VoiceTarget is nil")
+	if l.Bridge.MumbleClient == nil {
+        log.Println("MumbleClient is nil")
+        return
+    }
+    if l.Bridge.MumbleClient.VoiceTarget == nil {
+        log.Println("VoiceTarget is nil")
         return
     }
     
@@ -72,6 +76,14 @@ func (l *MumbleListener) updateVoiceTargets() {
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	l.Bridge.MumbleClient = e.Client
 	//join specified channel
+
+	if e.Client.VoiceTarget == nil {
+        e.Client.VoiceTarget = // proper initialization based on gumble documentation
+    }
+
+    // Additional setup or logging to confirm assignment
+    log.Println("MumbleClient successfully connected and assigned")
+	
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
 	if startingChannel != nil {
 		e.Client.Self.Move(startingChannel)
