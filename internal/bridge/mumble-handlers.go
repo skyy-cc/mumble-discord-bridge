@@ -15,75 +15,23 @@ type MumbleListener struct {
 }
 
 func (l *MumbleListener) updateUsers() {
-    // Ensure l.Bridge is not nil
-    if l.Bridge == nil {
-        log.Println("Bridge is nil")
-        return
-    }
+	l.Bridge.MumbleUsersMutex.Lock()
+	l.Bridge.MumbleUsers = make(map[string]bool)
+	for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
+		//note, this might be too slow for really really big channels?
+		//event listeners block while processing
+		//also probably bad to rebuild the set every user change.
+		if user.Name != l.Bridge.MumbleClient.Self.Name {
+			l.Bridge.MumbleUsers[user.Name] = true
+		}
+	}
+	promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
+	l.Bridge.MumbleUsersMutex.Unlock()
 
-    // Directly lock MumbleUsersMutex without nil check
-    l.Bridge.MumbleUsersMutex.Lock()
-    defer l.Bridge.MumbleUsersMutex.Unlock()
-
-    // Initialize MumbleUsers map
-    l.Bridge.MumbleUsers = make(map[string]bool)
-
-    // Ensure MumbleClient and its nested fields are not nil
-    if l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.Self == nil || l.Bridge.MumbleClient.Self.Channel == nil {
-        log.Println("MumbleClient, Self, or Self.Channel is nil")
-        return
-    }
-
-    for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
-        if user.Name != l.Bridge.MumbleClient.Self.Name {
-            l.Bridge.MumbleUsers[user.Name] = true
-        }
-    }
-
-    // Update metrics, assuming promMumbleUsers is correctly initialized elsewhere
-    if promMumbleUsers != nil { // Make sure this is a valid check based on its type
-        promMumbleUsers.Set(float64(len(l.Bridge.MumbleUsers)))
-    } else {
-        log.Println("promMumbleUsers is nil")
-    }
-
-    // Update voice targets
-    l.updateVoiceTargets()
 }
-
-
-
-func (l *MumbleListener) updateVoiceTargets() {
-	if l.Bridge.MumbleClient == nil {
-        log.Println("MumbleClient is nil")
-        return
-    }
-    if l.Bridge.MumbleClient.VoiceTarget == nil {
-        log.Println("VoiceTarget is nil")
-        return
-    }
-    
-    // Clear the current voice target's users
-    l.Bridge.MumbleClient.VoiceTarget.Clear()
-
-    // Iterate over all users in the bot's current channel and add them to the voice target
-    for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
-        l.Bridge.MumbleClient.VoiceTarget.AddUser(user)
-    }
-}
-
 
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
-	l.Bridge.MumbleClient = e.Client
 	//join specified channel
-
-	if e.Client.VoiceTarget == nil {
-        e.Client.VoiceTarget = // proper initialization based on gumble documentation
-    }
-
-    // Additional setup or logging to confirm assignment
-    log.Println("MumbleClient successfully connected and assigned")
-	
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
 	if startingChannel != nil {
 		e.Client.Self.Move(startingChannel)
