@@ -35,6 +35,7 @@ func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
 	if startingChannel != nil {
 		e.Client.Self.Move(startingChannel)
+		e.Client.VoiceTarget.Add(startingChannel)
 	}
 
 	// l.updateUsers() // patch below
