@@ -40,7 +40,7 @@ func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
         voiceTarget.ID = 1 // Set an ID for the voice target (IDs 1-31 are valid)
 
         // Add the channel to the voice target
-        voiceTarget.AddChannel(startingChannel)
+        voiceTarget.AddChannel(startingChannel, true, true, "")
 
         // Send the voice target configuration to the server
         e.Client.Send(&voiceTarget)
