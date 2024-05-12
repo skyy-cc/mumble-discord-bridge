@@ -39,14 +39,14 @@ func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	//join specified channel
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
     if startingChannel != nil {
+        fmt.Println("Found channel:", startingChannel.Name)
         voiceTarget := gumble.VoiceTarget{}
-        voiceTarget.ID = 1  // Use an unused ID
-
-        // Add the channel to the voice target
+        voiceTarget.ID = 1
         voiceTarget.AddChannel(startingChannel, true, true, "")
-
-        // Send the voice target configuration to the server
         e.Client.Send(&voiceTarget)
+        fmt.Println("Voice target set and sent for channel:", startingChannel.Name)
+    } else {
+        fmt.Println("Channel not found:", l.Bridge.BridgeConfig.MumbleChannel)
     }
 
 	// l.updateUsers() // patch below
