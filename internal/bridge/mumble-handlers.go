@@ -38,18 +38,19 @@ func (l *MumbleListener) updateUsers() {
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	//join specified channel
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
-	if startingChannel != nil {
-		//e.Client.Self.Move(startingChannel)
-		// Add starting channel as a target
-		voiceTarget := gumble.VoiceTarget{}
-        voiceTarget.ID = 1 // Set an ID for the voice target (IDs 1-31 are valid)
+    if startingChannel != nil {
+        voiceTarget := gumble.VoiceTarget{}
+        voiceTarget.ID = 1  // Set an ID for the voice target (IDs 1-31 are valid)
 
-        // Add the channel to the voice target
-        voiceTarget.AddChannel(startingChannel, true, true, "")
+        // Add the channel to the voice target with no recursion, no links, no group filter
+        voiceTarget.AddChannel(startingChannel, false, false, "")
+
+        // Apply the voice target to the client
+        e.Client.SetVoiceTarget(1)  // Ensure this ID matches the ID set in voiceTarget.ID
 
         // Send the voice target configuration to the server
         e.Client.Send(&voiceTarget)
-	}
+    }
 
 	// l.updateUsers() // patch below
 
