@@ -65,6 +65,15 @@ func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 }
 
 func (l *MumbleListener) MumbleUserChange(e *gumble.UserChangeEvent) {
+	if e == nil {
+        log.Println("User change event is nil")
+        return
+    }
+    if e.User == nil {
+        log.Println("User data is nil")
+        return
+    }
+
 	l.updateUsers()
 
 	if e.Type.Has(gumble.UserChangeConnected) {
