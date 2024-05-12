@@ -35,7 +35,15 @@ func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
 	if startingChannel != nil {
 		e.Client.Self.Move(startingChannel)
-		e.Client.VoiceTarget.Add(startingChannel)
+		// Add starting channel as a target
+		voiceTarget := gumble.VoiceTarget{}
+        voiceTarget.ID = 1 // Set an ID for the voice target (IDs 1-31 are valid)
+
+        // Add the channel to the voice target
+        voiceTarget.AddChannel(startingChannel)
+
+        // Send the voice target configuration to the server
+        e.Client.Send(&voiceTarget)
 	}
 
 	// l.updateUsers() // patch below
