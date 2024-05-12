@@ -101,7 +101,7 @@ func (l *MumbleListener) MumbleUserChange(e *gumble.UserChangeEvent) {
 	if e.Type.Has(gumble.UserChangeChannel) {
         if e.User.Channel == l.Bridge.MumbleClient.Self.Channel {
             log.Println("User started listening to the channel:", e.User.Name)
-        } else if e.User.OldChannel == l.Bridge.MumbleClient.Self.Channel {
+        } else {
             log.Println("User stopped listening to the channel:", e.User.Name)
         }
     }
