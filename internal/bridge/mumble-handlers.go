@@ -15,6 +15,11 @@ type MumbleListener struct {
 }
 
 func (l *MumbleListener) updateUsers() {
+	if l == nil || l.Bridge == nil || l.Bridge.MumbleClient == nil || l.Bridge.MumbleClient.Self == nil || l.Bridge.MumbleClient.Self.Channel == nil {
+        log.Println("One or more required properties are nil. Exiting updateUsers early.")
+        return
+    }
+
 	l.Bridge.MumbleUsersMutex.Lock()
 	l.Bridge.MumbleUsers = make(map[string]bool)
 	for _, user := range l.Bridge.MumbleClient.Self.Channel.Users {
