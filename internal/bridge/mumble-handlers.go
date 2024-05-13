@@ -37,7 +37,7 @@ func (l *MumbleListener) updateUsers() {
 
 func (l *MumbleListener) MumbleConnect(e *gumble.ConnectEvent) {
 	//join specified channel
-	startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
+	//startingChannel := e.Client.Channels.Find(l.Bridge.BridgeConfig.MumbleChannel...)
     //if startingChannel != nil {
     //    fmt.Println("Found channel:", startingChannel.Name)
     //    voiceTarget := gumble.VoiceTarget{}
