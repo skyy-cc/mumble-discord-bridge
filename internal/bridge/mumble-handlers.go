@@ -68,7 +68,7 @@ func (l *MumbleListener) MumbleUserChange(e *gumble.UserChangeEvent) {
 	l.updateUsers()
 
 	// Add all users as a voice target
-	voiceTarget := gumble.VoiceTarget{ID: 0} // Use ID 0 for the default voice target
+	voiceTarget := gumble.VoiceTarget{ID: 1} // Use ID 0 for the default voice target
 	l.Bridge.MumbleClient.Do(func() {
 		for _, channel := range l.Bridge.MumbleClient.Channels {
 			for _, user := range channel.Users {
